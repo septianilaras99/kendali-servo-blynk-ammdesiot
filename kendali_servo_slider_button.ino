@@ -1,4 +1,3 @@
-
 #define BLYNK_PRINT Serial
 #include <ESP8266WiFi.h>
 #include <BlynkSimpleEsp8266.h>
@@ -9,6 +8,7 @@ char ssid[] = "1245"; // SSID HP yang dipakai teathering
 char pass[] = "lalalayeyeye"; // password
 
 Servo servo;
+BlynkTimer timer;
 
 //kendali melalui slider
 BLYNK_WRITE(V0) {
@@ -37,6 +37,7 @@ BLYNK_WRITE(V2) {
 
 void gerakRotasi(){
   int sudut = 0;
+  
   for (sudut = 0; sudut < 180; sudut+=1){
     servo.write(sudut);
     delay(10);
@@ -45,24 +46,24 @@ void gerakRotasi(){
     servo.write(sudut);
     delay(10);
   }
+  
 }
+
 
 //kendali melalui button untuk rotasi looping
 BLYNK_WRITE(V3) {
   if(param.asInt() == 1) {     // if Button sends 1
     gerakRotasi();// start the function
-  }
+    timer.setInterval(1000L, gerakRotasi);
+  } else exit(0);
 }
 
 void setup() {
-  // put your setup code here, to run once:
-  //Debug console 
-  //Serial.begin(9600);
   Blynk.begin(auth, ssid, pass);
   servo.attach(2); //pin D4
 }
 
 void loop() {
-  // put your main code here, to run repeatedly:
   Blynk.run();
+  timer.run();
 }
